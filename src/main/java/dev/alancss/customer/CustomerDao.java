@@ -9,4 +9,7 @@ public interface CustomerDao {
 
     Optional<Customer> findById(Integer id);
 
+    void insert(Customer customer);
+
+    boolean existsByEmail(String email);
 }

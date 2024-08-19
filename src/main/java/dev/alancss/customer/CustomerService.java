@@ -35,4 +35,11 @@ public class CustomerService {
         var customer = new Customer(request.name(), request.email(), request.age());
         customerDao.insert(customer);
     }
+
+    public void removeCustomer(Integer customerId) {
+        if (!customerDao.existsById(customerId)) {
+            throw new ResourceNotFoundException("Customer with ID %d not found".formatted(customerId));
+        }
+        customerDao.deleteById(customerId);
+    }
 }

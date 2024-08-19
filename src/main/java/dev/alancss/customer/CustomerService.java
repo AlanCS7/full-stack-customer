@@ -1,5 +1,6 @@
 package dev.alancss.customer;
 
+import dev.alancss.exception.DuplicateResourceException;
 import dev.alancss.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,14 @@ public class CustomerService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with ID %d not found".formatted(id)
                 ));
+    }
+
+    public void addCustomer(CustomerRegistrationRequest request) {
+        if (customerDao.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email address already in use");
+        }
+
+        var customer = new Customer(request.name(), request.email(), request.age());
+        customerDao.insert(customer);
     }
 }

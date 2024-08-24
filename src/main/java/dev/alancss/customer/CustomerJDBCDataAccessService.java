@@ -74,7 +74,13 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
 
     @Override
     public void deleteById(Integer id) {
+        var sql = """
+                DELETE
+                FROM customer
+                WHERE id = ?;
+                """;
 
+        jdbcTemplate.update(sql, id);
     }
 
     @Override

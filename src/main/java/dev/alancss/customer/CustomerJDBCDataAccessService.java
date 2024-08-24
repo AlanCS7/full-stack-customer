@@ -3,6 +3,7 @@ package dev.alancss.customer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,6 +86,31 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
 
     @Override
     public void update(Customer customer) {
+        var params = new ArrayList<>();
+        var sql = new StringBuilder("UPDATE customer SET ");
 
+        if (customer.getName() != null) {
+            sql.append("name = ?, ");
+            params.add(customer.getName());
+        }
+
+        if (customer.getEmail() != null) {
+            sql.append("email = ?, ");
+            params.add(customer.getEmail());
+        }
+
+        if (customer.getAge() != null) {
+            sql.append("age = ? ");
+            params.add(customer.getAge());
+        }
+
+        if (sql.toString().endsWith(", ")) {
+            sql.setLength(sql.length() - 2);
+        }
+
+        sql.append(" WHERE id = ?;");
+        params.add(customer.getId());
+
+        jdbcTemplate.update(sql.toString(), params.toArray());
     }
 }

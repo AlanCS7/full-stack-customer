@@ -1,5 +1,6 @@
 package dev.alancss;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -24,5 +25,15 @@ public class TestcontainersTest {
     void canStartPostgresDB() {
         assertThat(postgreSQLContainer.isCreated()).isTrue();
         assertThat(postgreSQLContainer.isRunning()).isTrue();
+    }
+
+    @Test
+    void canApplyDbMigrationsWithFlyway() {
+        var flyway = Flyway.configure().dataSource(
+                postgreSQLContainer.getJdbcUrl(),
+                postgreSQLContainer.getUsername(),
+                postgreSQLContainer.getPassword()
+        ).load();
+        flyway.migrate();
     }
 }

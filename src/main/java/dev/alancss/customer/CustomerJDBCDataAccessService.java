@@ -88,20 +88,28 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     public void update(Customer customer) {
         var params = new ArrayList<>();
         var sql = new StringBuilder("UPDATE customer SET ");
+        boolean hasUpdates = false;
 
         if (customer.getName() != null) {
             sql.append("name = ?, ");
             params.add(customer.getName());
+            hasUpdates = true;
         }
 
         if (customer.getEmail() != null) {
             sql.append("email = ?, ");
             params.add(customer.getEmail());
+            hasUpdates = true;
         }
 
         if (customer.getAge() != null) {
             sql.append("age = ? ");
             params.add(customer.getAge());
+            hasUpdates = true;
+        }
+
+        if (!hasUpdates) {
+            return;
         }
 
         if (sql.toString().endsWith(", ")) {

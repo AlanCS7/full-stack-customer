@@ -1,5 +1,6 @@
 package dev.alancss;
 
+import com.github.javafaker.Faker;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -17,6 +18,7 @@ public abstract class AbstractTestcontainers {
 
     @Container
     protected static final PostgreSQLContainer<?> postgreSQLContainer;
+    protected static final Faker FAKER = new Faker();
 
     static {
         postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")

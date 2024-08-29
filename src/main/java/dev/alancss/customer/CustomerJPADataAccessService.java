@@ -15,37 +15,37 @@ public class CustomerJPADataAccessService implements CustomerDao {
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAllCustomers() {
         return customerRepository.findAll();
     }
 
     @Override
-    public Optional<Customer> findById(Integer id) {
+    public Optional<Customer> findCustomerById(Integer id) {
         return customerRepository.findById(id);
     }
 
     @Override
-    public void insert(Customer customer) {
+    public void insertCustomer(Customer customer) {
         customerRepository.save(customer);
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsCustomerByEmail(String email) {
         return customerRepository.existsByEmail(email);
     }
 
     @Override
-    public boolean existsById(Integer id) {
+    public boolean existsCustomerById(Integer id) {
         return customerRepository.existsById(id);
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteCustomerById(Integer id) {
         customerRepository.deleteById(id);
     }
 
     @Override
-    public void update(Customer customer) {
+    public void updateCustomer(Customer customer) {
         customerRepository.save(customer);
     }
 }

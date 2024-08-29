@@ -32,36 +32,36 @@ public class CustomerListDataAccessService implements CustomerDao {
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAllCustomers() {
         return customers;
     }
 
     @Override
-    public Optional<Customer> findById(Integer id) {
+    public Optional<Customer> findCustomerById(Integer id) {
         return customers.stream()
                 .filter(customer -> customer.getId().equals(id))
                 .findFirst();
     }
 
     @Override
-    public void insert(Customer customer) {
+    public void insertCustomer(Customer customer) {
         customers.add(customer);
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsCustomerByEmail(String email) {
         return customers.stream()
                 .anyMatch(customer -> customer.getEmail().equals(email));
     }
 
     @Override
-    public boolean existsById(Integer id) {
+    public boolean existsCustomerById(Integer id) {
         return customers.stream()
                 .anyMatch(customer -> customer.getId().equals(id));
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteCustomerById(Integer id) {
         customers.stream()
                 .filter(customer -> customer.getId().equals(id))
                 .findFirst()
@@ -69,7 +69,7 @@ public class CustomerListDataAccessService implements CustomerDao {
     }
 
     @Override
-    public void update(Customer customer) {
+    public void updateCustomer(Customer customer) {
         customers.add(customer);
     }
 }

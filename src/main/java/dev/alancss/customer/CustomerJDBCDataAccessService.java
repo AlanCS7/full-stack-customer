@@ -19,7 +19,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAllCustomers() {
         var sql = """
                 SELECT id, name, email, age
                 FROM customer;
@@ -29,7 +29,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public Optional<Customer> findById(Integer id) {
+    public Optional<Customer> findCustomerById(Integer id) {
         var sql = """
                 SELECT id, name, email, age
                 FROM customer
@@ -40,7 +40,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public void insert(Customer customer) {
+    public void insertCustomer(Customer customer) {
         var sql = """
                 INSERT INTO customer(name, email, age)
                 VALUES (?, ?, ?);
@@ -50,7 +50,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsCustomerByEmail(String email) {
         var sql = """
                 SELECT COUNT(id)
                 FROM customer
@@ -62,7 +62,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public boolean existsById(Integer id) {
+    public boolean existsCustomerById(Integer id) {
         var sql = """
                 SELECT COUNT(id)
                 FROM customer
@@ -74,7 +74,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteCustomerById(Integer id) {
         var sql = """
                 DELETE
                 FROM customer
@@ -85,7 +85,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     }
 
     @Override
-    public void update(Customer customer) {
+    public void updateCustomer(Customer customer) {
         var params = new ArrayList<>();
         var sql = new StringBuilder("UPDATE customer SET ");
         boolean hasUpdates = false;

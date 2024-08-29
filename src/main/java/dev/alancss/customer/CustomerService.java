@@ -18,34 +18,34 @@ public class CustomerService {
     }
 
     public List<Customer> getCustomers() {
-        return customerDao.findAll();
+        return customerDao.findAllCustomers();
     }
 
     public Customer getCustomer(Integer id) {
-        return customerDao.findById(id)
+        return customerDao.findCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with ID %d not found".formatted(id)
                 ));
     }
 
     public void addCustomer(CustomerRegistrationRequest request) {
-        if (customerDao.existsByEmail(request.email())) {
+        if (customerDao.existsCustomerByEmail(request.email())) {
             throw new DuplicateResourceException("Email address already in use");
         }
 
         var customer = new Customer(request.name(), request.email(), request.age());
-        customerDao.insert(customer);
+        customerDao.insertCustomer(customer);
     }
 
     public void removeCustomer(Integer customerId) {
-        if (!customerDao.existsById(customerId)) {
+        if (!customerDao.existsCustomerById(customerId)) {
             throw new ResourceNotFoundException("Customer with ID %d not found".formatted(customerId));
         }
-        customerDao.deleteById(customerId);
+        customerDao.deleteCustomerById(customerId);
     }
 
     public void updateCustomer(Integer customerId, CustomerUpdateRequest request) {
-        var customer = customerDao.findById(customerId)
+        var customer = customerDao.findCustomerById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with ID %d not found".formatted(customerId)
                 ));
@@ -63,7 +63,7 @@ public class CustomerService {
         }
 
         if (request.email() != null && !request.email().equals(customer.getEmail())) {
-            if (customerDao.existsByEmail(request.email())) {
+            if (customerDao.existsCustomerByEmail(request.email())) {
                 throw new DuplicateResourceException("Email address already in use");
             }
             customer.setEmail(request.email());
@@ -74,6 +74,6 @@ public class CustomerService {
             throw new RequestValidationException("No data changes found");
         }
 
-        customerDao.update(customer);
+        customerDao.updateCustomer(customer);
     }
 }

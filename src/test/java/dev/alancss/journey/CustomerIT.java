@@ -17,7 +17,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CustomerIntegrationTest {
+public class CustomerIT {
 
     private static final Random RANDOM = new Random();
     private static final String CUSTOMER_URI = "api/v1/customers";

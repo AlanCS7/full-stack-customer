@@ -28,8 +28,7 @@ public class Main {
             var customer = new Customer(
                     firstName + " " + lastName,
                     firstName.toLowerCase() + "." + lastName.toLowerCase() + "@mail.com",
-                    random.nextInt(16, 99)
-            );
+                    random.nextInt(16, 99));
 
             customerRepository.save(customer);
         };

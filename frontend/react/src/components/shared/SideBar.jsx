@@ -1,33 +1,33 @@
 import {
-  IconButton,
   Avatar,
   Box,
   CloseButton,
-  Flex,
-  HStack,
-  VStack,
-  Icon,
-  useColorModeValue,
-  Text,
   Drawer,
   DrawerContent,
-  useDisclosure,
+  Flex,
+  HStack,
+  Icon,
+  IconButton,
+  Image,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Image,
+  Text,
+  useColorModeValue,
+  useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
   FiBell,
   FiChevronDown,
+  FiCompass,
+  FiHome,
+  FiMenu,
+  FiSettings,
+  FiStar,
+  FiTrendingUp,
 } from "react-icons/fi";
 
 const LinkItems = [
@@ -143,7 +143,12 @@ const MobileNav = ({ onOpen, ...rest }) => {
         fontFamily="monospace"
         fontWeight="bold"
       >
-        Logo
+        <Image
+          borderRadius="full"
+          boxSize="50px"
+          src="./src/assets/images/logo.webp"
+          alt="Bug Developer"
+        />
       </Text>
 
       <HStack spacing={{ base: "0", md: "6" }}>

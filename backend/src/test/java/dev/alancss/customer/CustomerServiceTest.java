@@ -34,8 +34,8 @@ class CustomerServiceTest {
     void shouldGetAllCustomers() {
         // Given
         var expectedCustomers = List.of(
-                new Customer("Customer name", "customer@mail.com", 20),
-                new Customer("User name", "user@mail.com", 22)
+                new Customer("Customer name", "customer@mail.com", 20, Gender.MALE),
+                new Customer("User name", "user@mail.com", 22, Gender.MALE)
         );
         when(customerDao.findAllCustomers()).thenReturn(expectedCustomers);
 
@@ -51,7 +51,7 @@ class CustomerServiceTest {
     void shouldGetCustomerById() {
         // Given
         int customerId = 1;
-        Customer expectedCustomer = new Customer("Customer name", "customer@mail.com", 20);
+        Customer expectedCustomer = new Customer("Customer name", "customer@mail.com", 20, Gender.MALE);
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(expectedCustomer));
 
         // When
@@ -79,7 +79,7 @@ class CustomerServiceTest {
     @Test
     void shouldAddCustomer() {
         // Given
-        CustomerRegistrationRequest request = new CustomerRegistrationRequest("Customer name", "customer@mail.com", 20);
+        var request = new CustomerRegistrationRequest("Customer name", "customer@mail.com", 20, Gender.MALE);
         when(customerDao.existsCustomerByEmail(request.email())).thenReturn(false);
 
         // When
@@ -102,7 +102,7 @@ class CustomerServiceTest {
     @Test
     void shouldThrowDuplicateResourceExceptionWhenAddingCustomerWithExistingEmail() {
         // Given
-        CustomerRegistrationRequest request = new CustomerRegistrationRequest("Customer name", "customer@mail.com", 20);
+        var request = new CustomerRegistrationRequest("Customer name", "customer@mail.com", 20, Gender.MALE);
 
         // When
         when(customerDao.existsCustomerByEmail(request.email())).thenReturn(true);
@@ -150,7 +150,7 @@ class CustomerServiceTest {
     void shouldUpdateCustomer() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest("New name", "new@mail.com", 22);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));
@@ -171,7 +171,7 @@ class CustomerServiceTest {
         assertThat(capturedValue.getId()).isEqualTo(actualCustomer.getId());
         assertThat(capturedValue)
                 .usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "gender")
                 .isEqualTo(request);
     }
 
@@ -179,7 +179,7 @@ class CustomerServiceTest {
     void shouldUpdateCustomerName() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest("New name", null, null);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));
@@ -199,13 +199,14 @@ class CustomerServiceTest {
         assertThat(capturedValue.getName()).isEqualTo(request.name());
         assertThat(capturedValue.getEmail()).isEqualTo(actualCustomer.getEmail());
         assertThat(capturedValue.getAge()).isEqualTo(actualCustomer.getAge());
+        assertThat(capturedValue.getGender()).isEqualTo(actualCustomer.getGender());
     }
 
     @Test
     void shouldUpdateCustomerEmail() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest(null, "new@mail.com", null);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));
@@ -226,13 +227,14 @@ class CustomerServiceTest {
         assertThat(capturedValue.getName()).isEqualTo(actualCustomer.getName());
         assertThat(capturedValue.getEmail()).isEqualTo(request.email());
         assertThat(capturedValue.getAge()).isEqualTo(actualCustomer.getAge());
+        assertThat(capturedValue.getGender()).isEqualTo(actualCustomer.getGender());
     }
 
     @Test
     void shouldUpdateCustomerAge() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest(null, null, 22);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));
@@ -252,6 +254,7 @@ class CustomerServiceTest {
         assertThat(capturedValue.getName()).isEqualTo(actualCustomer.getName());
         assertThat(capturedValue.getEmail()).isEqualTo(actualCustomer.getEmail());
         assertThat(capturedValue.getAge()).isEqualTo(request.age());
+        assertThat(capturedValue.getGender()).isEqualTo(actualCustomer.getGender());
     }
 
     @Test
@@ -276,7 +279,7 @@ class CustomerServiceTest {
     void shouldThrowDuplicateResourceExceptionWhenUpdatingToExistingEmail() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest("New name", "new@mail.com", 22);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));
@@ -296,7 +299,7 @@ class CustomerServiceTest {
     void shouldThrowRequestValidationExceptionWhenNoChangesInUpdate() {
         // Given
         int customerId = 1;
-        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20);
+        var actualCustomer = new Customer(customerId, "Customer name", "customer@mail.com", 20, Gender.MALE);
         var request = new CustomerUpdateRequest("Customer name", "customer@mail.com", 20);
 
         when(customerDao.findCustomerById(customerId)).thenReturn(Optional.of(actualCustomer));

@@ -35,8 +35,8 @@ class CustomerJPADataAccessServiceTest {
     void shouldFindAllCustomers() {
         // Given
         var expectedCustomers = List.of(
-                new Customer("Customer name", "customer@mail.com", 20),
-                new Customer("User name", "user@mail.com", 22)
+                new Customer("Customer name", "customer@mail.com", 20, Gender.MALE),
+                new Customer("User name", "user@mail.com", 22, Gender.MALE)
         );
         when(customerRepository.findAll()).thenReturn(expectedCustomers);
 
@@ -52,7 +52,7 @@ class CustomerJPADataAccessServiceTest {
     void shouldFindCustomerById() {
         // Given
         int customerId = 1;
-        Customer expectedCustomer = new Customer("Customer name", "customer@mail.com", 20);
+        Customer expectedCustomer = new Customer("Customer name", "customer@mail.com", 20, Gender.MALE);
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(expectedCustomer));
 
         // When
@@ -66,7 +66,7 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void shouldInsertCustomer() {
         // Given
-        var customer = new Customer("Customer name", "customer@mail.com", 20);
+        var customer = new Customer("Customer name", "customer@mail.com", 20, Gender.MALE);
 
         // When
         underTest.insertCustomer(customer);
@@ -118,7 +118,7 @@ class CustomerJPADataAccessServiceTest {
     @Test
     void shouldUpdateCustomer() {
         // Given
-        var customer = new Customer("Customer name", "customer@mail.com", 20);
+        var customer = new Customer("Customer name", "customer@mail.com", 20, Gender.MALE);
 
         // When
         underTest.updateCustomer(customer);

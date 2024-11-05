@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import dev.alancss.customer.Customer;
 import dev.alancss.customer.CustomerRegistrationRequest;
 import dev.alancss.customer.CustomerUpdateRequest;
+import dev.alancss.customer.Gender;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +34,7 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age);
+        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
 
         // Act - Register the customer
         webTestClient.post()
@@ -57,7 +58,7 @@ public class CustomerIT {
         assertThat(customers).isNotNull();
 
         // Assert - Verify the customer is in the list
-        Customer expectedCustomer = new Customer(name, email, age);
+        Customer expectedCustomer = new Customer(name, email, age, Gender.MALE);
         assertThat(customers)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .contains(expectedCustomer);
@@ -71,7 +72,7 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age);
+        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
 
         // Act - Register the customer
         webTestClient.post()
@@ -126,7 +127,7 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age);
+        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
 
         // Act & Assert - Register the customer
         webTestClient.post()
@@ -179,7 +180,7 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age);
+        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
 
         // Act & Assert - Register the customer
         webTestClient.post()
@@ -234,7 +235,7 @@ public class CustomerIT {
         assertThat(updatedCustomer).isNotNull();
 
         // Create expected updated customer object
-        Customer expectedUpdatedCustomer = new Customer(registeredCustomerId, newName, email, age);
+        Customer expectedUpdatedCustomer = new Customer(registeredCustomerId, newName, email, age, Gender.MALE);
 
         // Assert using recursive comparison to check updated fields while ignoring "id"
         assertThat(updatedCustomer)

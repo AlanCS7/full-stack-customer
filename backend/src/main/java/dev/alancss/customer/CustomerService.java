@@ -33,7 +33,7 @@ public class CustomerService {
             throw new DuplicateResourceException("Email address already in use");
         }
 
-        var customer = new Customer(request.name(), request.email(), request.age());
+        var customer = new Customer(request.name(), request.email(), request.age(), request.gender());
         customerDao.insertCustomer(customer);
     }
 

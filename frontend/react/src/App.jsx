@@ -1,25 +1,30 @@
 import { Spinner, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import CardWithImage from "./components/Card";
+import CreateCustomerModal from "./components/CreateCustomerModal";
 import SidebarWithHeader from "./components/shared/SideBar";
 import { getCustomers } from "./services/client";
+import { errorNotification } from "./services/notification";
 
 const App = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchCustomers = async () => {
     setLoading(true);
-    getCustomers()
-      .then((res) => {
-        setCustomers(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+
+    try {
+      const response = await getCustomers();
+      setCustomers(response.data);
+    } catch (error) {
+      errorNotification(error.response.data.error, error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
   }, []);
 
   if (loading) {
@@ -39,17 +44,19 @@ const App = () => {
   if (customers.length <= 0) {
     return (
       <SidebarWithHeader>
-        <Text>No customers available</Text>
+        <CreateCustomerModal fetchCustomers={fetchCustomers} />
+        <Text mt={5}>No customers available</Text>
       </SidebarWithHeader>
     );
   }
 
   return (
     <SidebarWithHeader>
+      <CreateCustomerModal fetchCustomers={fetchCustomers} />
       <Wrap justify={"center"} spacing={"30px"}>
-        {customers.map((customer, index) => (
-          <WrapItem key={index}>
-            <CardWithImage {...customer} />
+        {customers.map((customer) => (
+          <WrapItem key={customer.id}>
+            <CardWithImage {...customer} fetchCustomers={fetchCustomers} />
           </WrapItem>
         ))}
       </Wrap>

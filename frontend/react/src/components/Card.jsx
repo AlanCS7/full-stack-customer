@@ -1,6 +1,13 @@
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Avatar,
   Box,
+  Button,
   Center,
   Flex,
   Heading,
@@ -9,15 +16,31 @@ import {
   Tag,
   Text,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { useRef } from "react";
+import { deleteCustomer } from "../services/client";
+import { successNotification } from "../services/notification";
+import UpdateCustomerModal from "./UpdateCustomerModal";
 
-export default function CardWithImage({ id, name, email, age, gender }) {
+export default function CardWithImage({
+  id,
+  name,
+  email,
+  age,
+  gender,
+  fetchCustomers,
+}) {
   const userGender = gender === "MALE" ? "men" : "women";
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
 
   return (
     <Center py={6}>
       <Box
-        maxW={"300px"}
+        minW={350}
+        maxW={380}
         w={"full"}
         bg={useColorModeValue("white", "gray.800")}
         boxShadow={"2xl"}
@@ -44,7 +67,7 @@ export default function CardWithImage({ id, name, email, age, gender }) {
         </Flex>
 
         <Box p={6}>
-          <Stack spacing={2} align={"center"} mb={5}>
+          <Stack spacing={2} align={"center"} mb={4}>
             <Tag borderRadius={"full"}>{id}</Tag>
             <Heading fontSize={"2xl"} fontWeight={500} fontFamily={"body"}>
               {name}
@@ -55,6 +78,81 @@ export default function CardWithImage({ id, name, email, age, gender }) {
             </Text>
           </Stack>
         </Box>
+        <Stack direction={"row"} justify={"center"} spacing={6} mb={7}>
+          <Stack>
+            <UpdateCustomerModal
+              initialValues={{ name, email, age }}
+              customerId={id}
+              fetchCustomers={fetchCustomers}
+            />
+          </Stack>
+          <Stack>
+            <Button
+              bg={"red.400"}
+              color={"white"}
+              rounded={"full"}
+              _hover={{
+                transform: "translateY(-2px)",
+                boxShadow: "lg",
+              }}
+              _focus={{
+                bg: "gray.500",
+              }}
+              onClick={onOpen}
+            >
+              Delete
+            </Button>
+            <AlertDialog
+              isOpen={isOpen}
+              leastDestructiveRef={cancelRef}
+              onClose={onClose}
+            >
+              <AlertDialogOverlay>
+                <AlertDialogContent>
+                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                    Delete Customer
+                  </AlertDialogHeader>
+
+                  <AlertDialogBody>
+                    Are you sure you want to delete {name}? You can't undo this
+                    action afterwards.
+                  </AlertDialogBody>
+
+                  <AlertDialogFooter>
+                    <Button ref={cancelRef} onClick={onClose}>
+                      Cancel
+                    </Button>
+                    <Button
+                      colorScheme="red"
+                      onClick={() => {
+                        deleteCustomer(id)
+                          .then(() => {
+                            successNotification(
+                              "Customer deleted",
+                              `${name} was successfully deleted`
+                            );
+                            fetchCustomers();
+                          })
+                          .catch((error) => {
+                            errorNotification(
+                              error.response.data.error,
+                              error.response.data.message
+                            );
+                          })
+                          .finally(() => {
+                            onClose();
+                          });
+                      }}
+                      ml={3}
+                    >
+                      Delete
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialogOverlay>
+            </AlertDialog>
+          </Stack>
+        </Stack>
       </Box>
     </Center>
   );

@@ -1,0 +1,37 @@
+name: CD - Deploy frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - frontend/react/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend/react
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      - name: Set build number
+        id: build-number
+        run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
+      - name: Docker Build and Push to Docker Hub
+        run: |
+          docker build . -t ${{ secrets.DOCKERHUB_USERNAME }}/customer-react:${{ steps.build-number.outputs.BUILD_NUMBER }}
+          
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/customer-react:${{ steps.build-number.outputs.BUILD_NUMBER }} ${{ secrets.DOCKERHUB_USERNAME }}/customer-react:latest
+
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/customer-react:${{ steps.build-number.outputs.BUILD_NUMBER }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/customer-react:latest

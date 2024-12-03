@@ -17,6 +17,7 @@ public class CustomerListDataAccessService implements CustomerDao {
         var customer = new Customer(
                 1,
                 "customer",
+                "password",
                 "customer@mail.com",
                 20,
                 Gender.MALE
@@ -26,6 +27,7 @@ public class CustomerListDataAccessService implements CustomerDao {
         var user = new Customer(
                 2,
                 "user",
+                "password",
                 "user@mail.com",
                 19,
                 Gender.MALE
@@ -73,5 +75,12 @@ public class CustomerListDataAccessService implements CustomerDao {
     @Override
     public void updateCustomer(Customer customer) {
         customers.add(customer);
+    }
+
+    @Override
+    public Optional<Customer> findUserByEmail(String email) {
+        return customers.stream()
+                .filter(customer -> customer.getUsername().equals(email))
+                .findFirst();
     }
 }

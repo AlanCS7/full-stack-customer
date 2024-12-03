@@ -4,6 +4,7 @@ import dev.alancss.exception.DuplicateResourceException;
 import dev.alancss.exception.RequestValidationException;
 import dev.alancss.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerDao customerDao;
+    private final PasswordEncoder passwordEncoder;
 
-    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao) {
+    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao, PasswordEncoder passwordEncoder) {
         this.customerDao = customerDao;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Customer> getCustomers() {
@@ -33,7 +36,13 @@ public class CustomerService {
             throw new DuplicateResourceException("Email address already in use");
         }
 
-        var customer = new Customer(request.name(), request.email(), request.age(), request.gender());
+        var customer = new Customer(
+                request.name(),
+                request.email(),
+                passwordEncoder.encode("password"),
+                request.age(),
+                request.gender());
+
         customerDao.insertCustomer(customer);
     }
 

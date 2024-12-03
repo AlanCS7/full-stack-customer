@@ -21,7 +21,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     @Override
     public List<Customer> findAllCustomers() {
         var sql = """
-                SELECT id, name, email, age, gender
+                SELECT id, name, email, password, age, gender
                 FROM customer;
                 """;
 
@@ -31,7 +31,7 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     @Override
     public Optional<Customer> findCustomerById(Integer id) {
         var sql = """
-                SELECT id, name, email, age, gender
+                SELECT id, name, email, password, age, gender
                 FROM customer
                 WHERE id = ?;
                 """;
@@ -42,11 +42,11 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
     @Override
     public void insertCustomer(Customer customer) {
         var sql = """
-                INSERT INTO customer(name, email, age, gender)
-                VALUES (?, ?, ?, ?);
+                INSERT INTO customer(name, email, password, age, gender)
+                VALUES (?, ?, ?, ?, ?);
                 """;
 
-        jdbcTemplate.update(sql, customer.getName(), customer.getEmail(), customer.getAge(), customer.getGender().name());
+        jdbcTemplate.update(sql, customer.getName(), customer.getEmail(), customer.getPassword(), customer.getAge(), customer.getGender().name());
     }
 
     @Override
@@ -120,5 +120,16 @@ public class CustomerJDBCDataAccessService implements CustomerDao {
         params.add(customer.getId());
 
         jdbcTemplate.update(sql.toString(), params.toArray());
+    }
+
+    @Override
+    public Optional<Customer> findUserByEmail(String email) {
+        var sql = """
+                SELECT id, name, email, password, age, gender
+                FROM customer
+                WHERE email = ?;
+                """;
+
+        return jdbcTemplate.query(sql, customerRowMapper, email).stream().findFirst();
     }
 }

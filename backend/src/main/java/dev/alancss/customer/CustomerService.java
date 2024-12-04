@@ -15,7 +15,7 @@ public class CustomerService {
     private final CustomerDao customerDao;
     private final PasswordEncoder passwordEncoder;
 
-    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao, PasswordEncoder passwordEncoder) {
+    public CustomerService(@Qualifier("jpa") CustomerDao customerDao, PasswordEncoder passwordEncoder) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
     }

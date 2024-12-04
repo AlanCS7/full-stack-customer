@@ -1,5 +1,6 @@
 package dev.alancss.security;
 
+import dev.alancss.jwt.JWTAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,14 +11,24 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter, UserDetailsService userDetailsService) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -26,7 +37,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.POST, "/api/v1/customers").permitAll()
                         .anyRequest().authenticated()
-                ).build();
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
@@ -40,12 +55,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
+    public AuthenticationProvider authenticationProvider() {
         var daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
 }

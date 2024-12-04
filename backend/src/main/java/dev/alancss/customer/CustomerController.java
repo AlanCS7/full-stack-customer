@@ -36,7 +36,7 @@ public class CustomerController {
         String token = jwtUtil.issueToken(request.email(), "ROLE_USER");
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .build();
     }
 

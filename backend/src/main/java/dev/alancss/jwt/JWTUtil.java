@@ -1,10 +1,11 @@
 package dev.alancss.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -35,7 +36,31 @@ public class JWTUtil {
                 .compact();
     }
 
-    private Key getSigningKey() {
+    public String getSubject(String token) {
+        return getClaims(token)
+                .getSubject();
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts
+                .parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public boolean isTokenValid(String token, String username) {
+        String subject = getSubject(token);
+        return subject.equals(username) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return getClaims(token).getExpiration().before(Date.from(Instant.now()));
+    }
+
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
+
 }

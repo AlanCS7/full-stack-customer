@@ -14,18 +14,24 @@ public class CustomerService {
 
     private final CustomerDao customerDao;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerDTOMapper customerDTOMapper;
 
-    public CustomerService(@Qualifier("jpa") CustomerDao customerDao, PasswordEncoder passwordEncoder) {
+    public CustomerService(@Qualifier("jpa") CustomerDao customerDao, PasswordEncoder passwordEncoder, CustomerDTOMapper customerDTOMapper) {
         this.customerDao = customerDao;
         this.passwordEncoder = passwordEncoder;
+        this.customerDTOMapper = customerDTOMapper;
     }
 
-    public List<Customer> getCustomers() {
-        return customerDao.findAllCustomers();
+    public List<CustomerDTO> getCustomers() {
+        return customerDao.findAllCustomers()
+                .stream()
+                .map(customerDTOMapper)
+                .toList();
     }
 
-    public Customer getCustomer(Integer id) {
+    public CustomerDTO getCustomer(Integer id) {
         return customerDao.findCustomerById(id)
+                .map(customerDTOMapper)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with ID %d not found".formatted(id)
                 ));

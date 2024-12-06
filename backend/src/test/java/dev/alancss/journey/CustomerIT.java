@@ -63,7 +63,7 @@ public class CustomerIT {
         assertThat(customers).isNotNull();
 
         // Assert - Verify the customer is in the list
-        CustomerDTO expectedCustomer = new CustomerDTO(null, name, email, age, Gender.MALE);
+        CustomerDTO expectedCustomer = new CustomerDTO(null, name, email, age, Gender.MALE, List.of("ROLE_USER"));
         assertThat(customers)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .contains(expectedCustomer);
@@ -267,7 +267,7 @@ public class CustomerIT {
         assertThat(updatedCustomer).isNotNull();
 
         // Create expected updated customer object
-        CustomerDTO expectedUpdatedCustomer = new CustomerDTO(registeredCustomerId, newName, email, age, Gender.MALE);
+        CustomerDTO expectedUpdatedCustomer = new CustomerDTO(registeredCustomerId, newName, email, age, Gender.MALE, List.of("ROLE_USER"));
 
         // Assert using recursive comparison to check updated fields while ignoring "id"
         assertThat(updatedCustomer)

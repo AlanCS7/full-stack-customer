@@ -45,7 +45,7 @@ public class CustomerService {
         var customer = new Customer(
                 request.name(),
                 request.email(),
-                passwordEncoder.encode("password"),
+                passwordEncoder.encode(request.password()),
                 request.age(),
                 request.gender());
 

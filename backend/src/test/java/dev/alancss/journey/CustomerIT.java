@@ -1,13 +1,14 @@
 package dev.alancss.journey;
 
 import com.github.javafaker.Faker;
-import dev.alancss.customer.Customer;
+import dev.alancss.customer.CustomerDTO;
 import dev.alancss.customer.CustomerRegistrationRequest;
 import dev.alancss.customer.CustomerUpdateRequest;
 import dev.alancss.customer.Gender;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -34,31 +35,35 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
+        var request = new CustomerRegistrationRequest(name, email, "password", age, Gender.MALE);
 
         // Act - Register the customer
-        webTestClient.post()
+        String jwtToken = webTestClient.post()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(HttpHeaders.AUTHORIZATION).get(0);
 
         // Assert - Retrieve and verify the customer list
-        List<Customer> customers = webTestClient.get()
+        List<CustomerDTO> customers = webTestClient.get()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
+                .expectBodyList(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
         assertThat(customers).isNotNull();
 
         // Assert - Verify the customer is in the list
-        Customer expectedCustomer = new Customer(name, email, age, Gender.MALE);
+        CustomerDTO expectedCustomer = new CustomerDTO(null, name, email, age, Gender.MALE);
         assertThat(customers)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .contains(expectedCustomer);
@@ -72,24 +77,28 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
+        var request = new CustomerRegistrationRequest(name, email, "password", age, Gender.MALE);
 
         // Act - Register the customer
-        webTestClient.post()
+        String jwtToken = webTestClient.post()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(HttpHeaders.AUTHORIZATION).get(0);
 
         // Assert - Retrieve and verify the customer list
-        List<Customer> customers = webTestClient.get()
+        List<CustomerDTO> customers = webTestClient.get()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
+                .expectBodyList(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
@@ -97,26 +106,27 @@ public class CustomerIT {
 
         // Extract the ID of the newly registered customer
         int registeredCustomerId = customers.stream()
-                .filter(customer -> customer.getEmail().equals(email))
-                .map(Customer::getId)
+                .filter(customer -> customer.email().equals(email))
+                .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Expected customer not found in the list."));
 
         // Act & Assert - Retrieve the customer by ID
-        Customer retrievedCustomer = webTestClient.get()
+        CustomerDTO retrievedCustomer = webTestClient.get()
                 .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Customer.class)
+                .expectBody(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
         assertThat(retrievedCustomer).isNotNull();
-        assertThat(retrievedCustomer.getId()).isEqualTo(registeredCustomerId);
-        assertThat(retrievedCustomer.getName()).isEqualTo(name);
-        assertThat(retrievedCustomer.getEmail()).isEqualTo(email);
-        assertThat(retrievedCustomer.getAge()).isEqualTo(age);
+        assertThat(retrievedCustomer.id()).isEqualTo(registeredCustomerId);
+        assertThat(retrievedCustomer.name()).isEqualTo(name);
+        assertThat(retrievedCustomer.email()).isEqualTo(email);
+        assertThat(retrievedCustomer.age()).isEqualTo(age);
     }
 
     @Test
@@ -127,7 +137,8 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
+        var request = new CustomerRegistrationRequest(name, email, "password", age, Gender.MALE);
+        var requestToGetToken = new CustomerRegistrationRequest(name, email + ".contact", "password", age, Gender.MALE);
 
         // Act & Assert - Register the customer
         webTestClient.post()
@@ -136,15 +147,28 @@ public class CustomerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated();
 
-        // Act - Retrieve the list of customers
-        List<Customer> customers = webTestClient.get()
+        // Act & Assert - Register the customer to get token
+        String jwtToken = webTestClient.post()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestToGetToken)
+                .exchange()
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(HttpHeaders.AUTHORIZATION).get(0);
+
+        // Act - Retrieve the list of customers
+        List<CustomerDTO> customers = webTestClient.get()
+                .uri(CUSTOMER_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
+                .expectBodyList(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
@@ -152,8 +176,8 @@ public class CustomerIT {
 
         // Extract the ID of the newly registered customer
         int registeredCustomerId = customers.stream()
-                .filter(customer -> customer.getEmail().equals(email))
-                .map(Customer::getId)
+                .filter(customer -> customer.email().equals(email))
+                .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Expected customer not found in the list."));
 
@@ -161,6 +185,7 @@ public class CustomerIT {
         webTestClient.delete()
                 .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk();
 
@@ -168,6 +193,7 @@ public class CustomerIT {
         webTestClient.get()
                 .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -180,24 +206,28 @@ public class CustomerIT {
         String email = faker.name().lastName() + "-" + UUID.randomUUID() + "@mail.com";
         int age = RANDOM.nextInt(18, 99);
 
-        var request = new CustomerRegistrationRequest(name, email, age, Gender.MALE);
+        var request = new CustomerRegistrationRequest(name, email, "password", age, Gender.MALE);
 
         // Act & Assert - Register the customer
-        webTestClient.post()
+        String jwtToken = webTestClient.post()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated()
+                .returnResult(Void.class)
+                .getResponseHeaders()
+                .get(HttpHeaders.AUTHORIZATION).get(0);
 
         // Act - Retrieve the list of customers
-        List<Customer> customers = webTestClient.get()
+        List<CustomerDTO> customers = webTestClient.get()
                 .uri(CUSTOMER_URI)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
+                .expectBodyList(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
@@ -205,37 +235,39 @@ public class CustomerIT {
 
         // Extract the ID of the newly registered customer
         int registeredCustomerId = customers.stream()
-                .filter(customer -> customer.getEmail().equals(email))
-                .map(Customer::getId)
+                .filter(customer -> customer.email().equals(email))
+                .map(CustomerDTO::id)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Expected customer not found in the list."));
 
         // Act & Assert - Update the customer
         String newName = "New Name";
-        var updateRequest = new CustomerUpdateRequest(newName, null, null);
+        var updateRequest = new CustomerUpdateRequest(newName, null, "password", null);
 
         webTestClient.put()
                 .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(updateRequest)
                 .exchange()
                 .expectStatus().isOk();
 
         // Act & Assert - Verify the customer was updated
-        Customer updatedCustomer = webTestClient.get()
+        CustomerDTO updatedCustomer = webTestClient.get()
                 .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Customer.class)
+                .expectBody(CustomerDTO.class)
                 .returnResult()
                 .getResponseBody();
 
         assertThat(updatedCustomer).isNotNull();
 
         // Create expected updated customer object
-        Customer expectedUpdatedCustomer = new Customer(registeredCustomerId, newName, email, age, Gender.MALE);
+        CustomerDTO expectedUpdatedCustomer = new CustomerDTO(registeredCustomerId, newName, email, age, Gender.MALE);
 
         // Assert using recursive comparison to check updated fields while ignoring "id"
         assertThat(updatedCustomer)

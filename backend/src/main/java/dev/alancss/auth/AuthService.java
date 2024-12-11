@@ -32,6 +32,6 @@ public class AuthService {
         var customerDTO = customerDTOMapper.apply(customer);
         String token = jwtUtil.issueToken(customer.getUsername(), customerDTO.roles().toArray(new String[0]));
 
-        return new AuthResponse(token, customerDTO);
+        return new AuthResponse(token);
     }
 }

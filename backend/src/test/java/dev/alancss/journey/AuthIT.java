@@ -3,7 +3,6 @@ package dev.alancss.journey;
 import com.github.javafaker.Faker;
 import dev.alancss.auth.AuthRequest;
 import dev.alancss.auth.AuthResponse;
-import dev.alancss.customer.CustomerDTO;
 import dev.alancss.customer.CustomerRegistrationRequest;
 import dev.alancss.customer.Gender;
 import dev.alancss.jwt.JWTUtil;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -80,15 +78,6 @@ public class AuthIT {
 
         String jwtToken = result.getResponseHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 
-        var responseBody = result.getResponseBody();
-        CustomerDTO customerDTO = responseBody.customer();
-
-        assertThat(jwtUtil.isTokenValid(jwtToken, customerDTO.email())).isTrue();
-
-        assertThat(customerDTO.email()).isEqualTo(email);
-        assertThat(customerDTO.age()).isEqualTo(age);
-        assertThat(customerDTO.name()).isEqualTo(name);
-        assertThat(customerDTO.gender()).isEqualTo(gender);
-        assertThat(customerDTO.roles()).isEqualTo(List.of("ROLE_USER"));
+        assertThat(jwtUtil.isTokenValid(jwtToken, email)).isTrue();
     }
 }

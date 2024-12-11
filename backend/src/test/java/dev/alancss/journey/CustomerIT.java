@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CustomerIT {
 
     private static final Random RANDOM = new Random();
-    private static final String CUSTOMER_URI = "api/v1/customers";
+    private static final String CUSTOMER_PATH = "api/v1/customers";
 
     @Autowired
     private WebTestClient webTestClient;
@@ -39,7 +39,7 @@ public class CustomerIT {
 
         // Act - Register the customer
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -51,7 +51,7 @@ public class CustomerIT {
 
         // Assert - Retrieve and verify the customer list
         List<CustomerDTO> customers = webTestClient.get()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -81,7 +81,7 @@ public class CustomerIT {
 
         // Act - Register the customer
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -93,7 +93,7 @@ public class CustomerIT {
 
         // Assert - Retrieve and verify the customer list
         List<CustomerDTO> customers = webTestClient.get()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -113,7 +113,7 @@ public class CustomerIT {
 
         // Act & Assert - Retrieve the customer by ID
         CustomerDTO retrievedCustomer = webTestClient.get()
-                .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
+                .uri(CUSTOMER_PATH + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -142,7 +142,7 @@ public class CustomerIT {
 
         // Act & Assert - Register the customer
         webTestClient.post()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -151,7 +151,7 @@ public class CustomerIT {
 
         // Act & Assert - Register the customer to get token
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestToGetToken)
@@ -163,7 +163,7 @@ public class CustomerIT {
 
         // Act - Retrieve the list of customers
         List<CustomerDTO> customers = webTestClient.get()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -183,7 +183,7 @@ public class CustomerIT {
 
         // Act & Assert - Delete the customer
         webTestClient.delete()
-                .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
+                .uri(CUSTOMER_PATH + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -191,7 +191,7 @@ public class CustomerIT {
 
         // Act & Assert - Verify the customer no longer exists
         webTestClient.get()
-                .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
+                .uri(CUSTOMER_PATH + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -210,7 +210,7 @@ public class CustomerIT {
 
         // Act & Assert - Register the customer
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -222,7 +222,7 @@ public class CustomerIT {
 
         // Act - Retrieve the list of customers
         List<CustomerDTO> customers = webTestClient.get()
-                .uri(CUSTOMER_URI)
+                .uri(CUSTOMER_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()
@@ -245,7 +245,7 @@ public class CustomerIT {
         var updateRequest = new CustomerUpdateRequest(newName, null, "password", null);
 
         webTestClient.put()
-                .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
+                .uri(CUSTOMER_PATH + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -255,7 +255,7 @@ public class CustomerIT {
 
         // Act & Assert - Verify the customer was updated
         CustomerDTO updatedCustomer = webTestClient.get()
-                .uri(CUSTOMER_URI + "/{id}", registeredCustomerId)
+                .uri(CUSTOMER_PATH + "/{id}", registeredCustomerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(jwtToken))
                 .exchange()

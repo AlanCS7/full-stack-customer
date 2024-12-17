@@ -41,3 +41,14 @@ export const updateCustomer = async (customerId, customer) => {
     throw error;
   }
 };
+
+export const login = async (credentials) => {
+  try {
+    return await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/login`,
+      credentials
+    );
+  } catch (error) {
+    throw error;
+  }
+};

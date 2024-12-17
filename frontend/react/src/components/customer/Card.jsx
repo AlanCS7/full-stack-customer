@@ -19,8 +19,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { deleteCustomer } from "../services/client";
-import { successNotification } from "../services/notification";
+import { deleteCustomer } from "../../services/client";
+import { successNotification } from "../../services/notification";
 import UpdateCustomerModal from "./UpdateCustomerModal";
 
 export default function CardWithImage({

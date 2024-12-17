@@ -5,15 +5,16 @@ import {
   Button,
   FormLabel,
   Input,
+  Select,
   Stack,
 } from "@chakra-ui/react";
 import { Form, Formik, useField } from "formik";
 import * as Yup from "yup";
-import { updateCustomer } from "../services/client";
+import { createCustomer } from "../../services/client";
 import {
   errorNotification,
   successNotification,
-} from "../services/notification";
+} from "../../services/notification";
 
 const MyTextInput = ({ label, ...props }) => {
   const [field, meta] = useField(props);
@@ -31,15 +32,31 @@ const MyTextInput = ({ label, ...props }) => {
   );
 };
 
-const UpdateCustomerForm = ({
-  closeForm,
-  fetchCustomers,
-  initialValues,
-  customerId,
-}) => {
+const MySelect = ({ label, ...props }) => {
+  const [field, meta] = useField(props);
+  return (
+    <Box>
+      <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
+      <Select {...field} {...props} />
+      {meta.touched && meta.error ? (
+        <Alert className="error" status="error" mt={2}>
+          <AlertIcon />
+          {meta.error}
+        </Alert>
+      ) : null}
+    </Box>
+  );
+};
+
+const CreateCustomerForm = ({ closeForm, fetchCustomers }) => {
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={{
+        name: "",
+        email: "",
+        age: "",
+        gender: "",
+      }}
       validationSchema={Yup.object({
         name: Yup.string()
           .min(3, "Must be at least 3 characters")
@@ -49,17 +66,21 @@ const UpdateCustomerForm = ({
           .min(16, "Must be at least 16 years of age")
           .max(99, "Must be less than 99 years of age")
           .required("Required"),
+        gender: Yup.string()
+          .required("Required")
+          .oneOf(["MALE", "FEMALE"], "Invalid gender")
+          .required("Required"),
       })}
-      onSubmit={(updatedCustomer, { setSubmitting }) => {
+      onSubmit={(customer, { setSubmitting }) => {
         setSubmitting(true);
-        updateCustomer(customerId, updatedCustomer)
+        createCustomer(customer)
           .then((res) => {
             successNotification(
-              "Customer updated",
-              `${updatedCustomer.name} was successfully updated`
+              "Customer created",
+              `${customer.name} was successfully created`
             );
-            closeForm();
             fetchCustomers();
+            closeForm();
           })
           .catch((error) => {
             errorNotification(
@@ -72,7 +93,7 @@ const UpdateCustomerForm = ({
           });
       }}
     >
-      {({ isValid, isSubmitting, dirty }) => (
+      {({ isValid, isSubmitting }) => (
         <Form>
           <Stack spacing={"24px"}>
             <MyTextInput
@@ -96,6 +117,12 @@ const UpdateCustomerForm = ({
               placeholder="16"
             />
 
+            <MySelect label="Gender" name="gender">
+              <option value="">Select gender</option>
+              <option value="MALE">MALE</option>
+              <option value="FEMALE">FEMALE</option>
+            </MySelect>
+
             <Box
               sx={{
                 display: "flex",
@@ -106,7 +133,7 @@ const UpdateCustomerForm = ({
               <Button
                 type="submit"
                 colorScheme="teal"
-                disabled={!(isValid && dirty) || isSubmitting}
+                disabled={!isValid || isSubmitting}
               >
                 Submit
               </Button>
@@ -119,4 +146,4 @@ const UpdateCustomerForm = ({
   );
 };
 
-export default UpdateCustomerForm;
+export default CreateCustomerForm;

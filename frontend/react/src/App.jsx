@@ -1,7 +1,7 @@
 import { Spinner, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import CardWithImage from "./components/Card";
-import CreateCustomerModal from "./components/CreateCustomerModal";
+import CardWithImage from "./components/customer/Card";
+import CreateCustomerModal from "./components/customer/CreateCustomerModal";
 import SidebarWithHeader from "./components/shared/SideBar";
 import { getCustomers } from "./services/client";
 import { errorNotification } from "./services/notification";

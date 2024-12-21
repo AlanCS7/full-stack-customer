@@ -1,11 +1,35 @@
 import axios from "axios";
 
+const getAuthConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+  },
+});
+
 export const getCustomers = async () => {
   try {
     return await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`,
+      getAuthConfig()
     );
   } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const getCustomerByEmail = async (email) => {
+  try {
+    const response = await axios.get(
+      `${
+        import.meta.env.VITE_API_BASE_URL
+      }/api/v1/customers/search?email=${email}`,
+      getAuthConfig()
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -17,6 +41,7 @@ export const createCustomer = async (customer) => {
       customer
     );
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -24,9 +49,11 @@ export const createCustomer = async (customer) => {
 export const deleteCustomer = async (customerId) => {
   try {
     return await axios.delete(
-      `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${customerId}`
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${customerId}`,
+      getAuthConfig()
     );
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -35,9 +62,11 @@ export const updateCustomer = async (customerId, customer) => {
   try {
     return await axios.put(
       `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${customerId}`,
-      customer
+      customer,
+      getAuthConfig()
     );
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -49,6 +78,7 @@ export const login = async (credentials) => {
       credentials
     );
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };

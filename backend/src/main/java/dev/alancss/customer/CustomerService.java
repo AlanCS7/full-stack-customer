@@ -91,4 +91,12 @@ public class CustomerService {
 
         customerDao.updateCustomer(customer);
     }
+
+    public CustomerDTO getCustomerByEmail(String email) {
+        return customerDao.findUserByEmail(email)
+                .map(customerDTOMapper)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Customer with email %s not found".formatted(email)
+                ));
+    }
 }

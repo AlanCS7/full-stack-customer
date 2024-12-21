@@ -59,7 +59,9 @@ export default function CardWithImage({
         <Flex justify={"center"} mt={-12}>
           <Avatar
             size={"xl"}
-            src={`https://randomuser.me/api/portraits/${userGender}/${id}.jpg`}
+            src={`https://randomuser.me/api/portraits/${userGender}/${
+              Math.floor(Math.random() * 100) + 1
+            }.jpg`}
             css={{
               border: "2px solid white",
             }}

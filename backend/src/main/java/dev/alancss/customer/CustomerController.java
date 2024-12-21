@@ -26,7 +26,7 @@ public class CustomerController {
     }
 
     @GetMapping("{customerId}")
-    public CustomerDTO getCustomers(@PathVariable int customerId) {
+    public CustomerDTO getCustomer(@PathVariable int customerId) {
         return customerService.getCustomer(customerId);
     }
 
@@ -49,4 +49,10 @@ public class CustomerController {
     public void updateCustomer(@PathVariable Integer customerId, @RequestBody CustomerUpdateRequest request) {
         customerService.updateCustomer(customerId, request);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(customerService.getCustomerByEmail(email));
+    }
+
 }

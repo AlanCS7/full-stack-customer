@@ -1,19 +1,30 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { login as performLogin } from "../../services/client";
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  getCustomerByEmail,
+  login as performLogin,
+} from "../../services/client";
 import { decodeToken, isTokenValid } from "../../services/tokenUtils";
+
+const getToken = () => localStorage.getItem("access_token");
+const setToken = (token) => localStorage.setItem("access_token", token);
+const removeToken = () => localStorage.removeItem("access_token");
 
 const AuthContext = createContext({});
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const loadUserFromToken = () => {
-    const token = localStorage.getItem("access_token");
+  const loadUserFromToken = async () => {
+    const token = getToken();
     if (token && isTokenValid(token)) {
-      const decoded = decodeToken(token);
-      setUser({ email: decoded.sub });
-    } else {
-      setUser(null);
+      try {
+        const decoded = decodeToken(token);
+        const response = await getCustomerByEmail(decoded.sub);
+        setUser({ name: response.data.name, roles: response.data.roles });
+      } catch (error) {
+        console.error("Error loading user from token:", error);
+        logout();
+      }
     }
   };
 
@@ -22,27 +33,41 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    return new Promise((resolve, reject) => {
-      performLogin(credentials)
-        .then((response) => {
-          const token = response.data.token;
-          localStorage.setItem("access_token", token);
-          loadUserFromToken();
-          resolve(response);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    try {
+      const response = await performLogin(credentials);
+      const token = response.data.token;
+      setToken(token);
+      await loadUserFromToken();
+      return response;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
+    removeToken();
     setUser(null);
   };
 
+  const isCustomerAuthenticated = () => {
+    const token = getToken();
+    if (!token || !isTokenValid(token)) {
+      logout();
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ login, logout, user }}>
+    <AuthContext.Provider
+      value={{
+        login,
+        logout,
+        user,
+        isCustomerAuthenticated,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

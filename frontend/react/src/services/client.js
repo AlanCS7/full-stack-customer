@@ -20,14 +20,12 @@ export const getCustomers = async () => {
 
 export const getCustomerByEmail = async (email) => {
   try {
-    const response = await axios.get(
+    return await axios.get(
       `${
         import.meta.env.VITE_API_BASE_URL
       }/api/v1/customers/search?email=${email}`,
       getAuthConfig()
     );
-
-    return response.data;
   } catch (error) {
     console.log(error);
     throw error;

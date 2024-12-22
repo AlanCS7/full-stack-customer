@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.jsx";
 import AuthProvider from "./components/context/AuthContext.jsx";
 import Login from "./components/login/Login.jsx";
+import ProtectedRoute from "./components/shared/ProtectedRoute.jsx";
 import "./index.css";
 
 const { ToastContainer } = createStandaloneToast();
@@ -17,7 +18,11 @@ const router = createBrowserRouter([
   },
   {
     path: "dashboard",
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
   },
 ]);
 

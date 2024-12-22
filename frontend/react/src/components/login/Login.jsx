@@ -11,10 +11,11 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Form, Formik, useField } from "formik";
-import * as Yup from "yup";
-import { useAuth } from "../context/AuthContext";
-import { errorNotification } from "../../services/notification";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+import { errorNotification } from "../../services/notification";
+import { useAuth } from "../context/AuthContext";
 
 const MyTextInput = ({ label, ...props }) => {
   const [field, meta] = useField(props);
@@ -90,6 +91,15 @@ const LoginForm = () => {
 };
 
 const Login = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  });
+
   return (
     <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
       <Flex p={8} flex={1} align={"center"} justify={"center"}>

@@ -30,8 +30,6 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
-import { getCustomerByEmail } from "../../services/client";
-import { useEffect, useState } from "react";
 
 const LinkItems = [
   { name: "Home", icon: FiHome },
@@ -40,16 +38,6 @@ const LinkItems = [
   { name: "Favourites", icon: FiStar },
   { name: "Settings", icon: FiSettings },
 ];
-
-const fetchCustomer = async (email) => {
-  try {
-    const response = await getCustomerByEmail(email);
-    return response;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
 
 const SidebarContent = ({ onClose, ...rest }) => {
   return (
@@ -131,32 +119,6 @@ const NavItem = ({ icon, children, ...rest }) => {
 
 const MobileNav = ({ onOpen, ...rest }) => {
   const { logout, user } = useAuth();
-  const [customer, setCustomer] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const getCustomer = async () => {
-      try {
-        if (user?.email) {
-          const customerData = await fetchCustomer(user.email);
-          setCustomer(customerData);
-          setLoading(false);
-        }
-      } catch (err) {
-        setError("Erro ao carregar os dados do cliente.");
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      getCustomer();
-    }
-  }, [user]);
-
-  if (loading) {
-    return <p>Carregando informações...</p>;
-  }
 
   return (
     <Flex
@@ -219,8 +181,8 @@ const MobileNav = ({ onOpen, ...rest }) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">{customer?.name}</Text>
-                  {customer.roles.map((role, id) => (
+                  <Text fontSize="sm">{user?.name}</Text>
+                  {user?.roles.map((role, id) => (
                     <Text id={id} key={role} fontSize="xs" color="gray.600">
                       {role}
                     </Text>

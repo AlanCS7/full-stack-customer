@@ -35,8 +35,6 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ChakraProvider>
       <AuthProvider>
-        {" "}
-        console.log(error);
         <RouterProvider router={router} />
       </AuthProvider>
       <ToastContainer />

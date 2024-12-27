@@ -8,7 +8,7 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import CreateCustomerForm from "./CreateCustomerForm";
+import CreateCustomerForm from "../shared/CreateCustomerForm";
 
 const AddIcon = () => "+";
 
@@ -28,7 +28,8 @@ const CreateCustomerModal = ({ fetchCustomers }) => {
           <ModalBody pb={6}>
             <CreateCustomerForm
               closeForm={onClose}
-              fetchCustomers={fetchCustomers}
+              onSuccess={fetchCustomers}
+              isSigningUp={false}
             />
           </ModalBody>
         </ModalContent>

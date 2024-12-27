@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   getCustomerByEmail,
   login as performLogin,
@@ -52,21 +52,21 @@ export const AuthProvider = ({ children }) => {
 
   const isCustomerAuthenticated = () => {
     const token = getToken();
-    if (!token || !isTokenValid(token)) {
-      logout();
-      return false;
-    }
-    return true;
+    return token && isTokenValid(token);
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        login,
-        logout,
-        user,
-        isCustomerAuthenticated,
-      }}
+      value={useMemo(
+        () => ({
+          login,
+          logout,
+          user,
+          isCustomerAuthenticated,
+          loadUserFromToken,
+        }),
+        [user]
+      )}
     >
       {children}
     </AuthContext.Provider>

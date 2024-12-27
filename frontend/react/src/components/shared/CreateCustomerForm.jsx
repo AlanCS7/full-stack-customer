@@ -48,7 +48,7 @@ const MySelect = ({ label, ...props }) => {
   );
 };
 
-const CreateCustomerForm = ({ closeForm, fetchCustomers }) => {
+const CreateCustomerForm = ({ closeForm, onSuccess, isSigningUp }) => {
   return (
     <Formik
       initialValues={{
@@ -84,13 +84,13 @@ const CreateCustomerForm = ({ closeForm, fetchCustomers }) => {
               "Customer created",
               `${customer.name} was successfully created`
             );
-            fetchCustomers();
-            closeForm();
+            onSuccess(res.headers["authorization"]);
+            closeForm?.();
           })
           .catch((error) => {
             errorNotification(
-              error.response.data.error,
-              error.response.data.message
+              error.response?.data.error,
+              error.response?.data.message
             );
           })
           .finally(() => {
@@ -144,12 +144,13 @@ const CreateCustomerForm = ({ closeForm, fetchCustomers }) => {
             >
               <Button
                 type="submit"
-                colorScheme="teal"
+                {...(isSigningUp ? { w: "full" } : {})}
+                colorScheme={isSigningUp ? "gray" : "teal"}
                 disabled={!isValid || isSubmitting}
               >
                 Submit
               </Button>
-              <Button onClick={closeForm}>Cancel</Button>
+              {!isSigningUp && <Button onClick={closeForm}>Cancel</Button>}
             </Box>
           </Stack>
         </Form>
